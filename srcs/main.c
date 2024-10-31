@@ -62,8 +62,9 @@ void scrambler(t_ham *ham)
 	case 0:
 		return ;
 	case 1:
-		ham->v[random % 15] = !ham->v[random % 15]; // fall-trough is voluntary
+		ham->v[random % 15] = !ham->v[random % 15];
 		printf("bit %d has been flipped\n", random % 15);
+		__attribute__ ((fallthrough));
 	case 2:
 		ham->v[random % 12] = !ham->v[random % 12];
 		printf("bit %d has been flipped\n", random % 12);
