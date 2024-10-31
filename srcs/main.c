@@ -60,6 +60,7 @@ void scrambler(t_ham *ham)
 	switch (random % 3)
 	{
 	case 0:
+		printf("no bit has been flipped\n");
 		return ;
 	case 1:
 		ham->v[random % 15] = !ham->v[random % 15];
