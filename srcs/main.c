@@ -18,11 +18,6 @@ void error(char *s)
 
 void encode(t_ham *ham, char c)
 {
-	// Unused bits are set to 0
-	ham->v[3] = 0;
-	ham->v[5] = 0;
-	ham->v[12] = 0;
-
 	// We encode our bits in the payload
 	ham->v[6] = c & 0b10000000;
 	ham->v[7] = c & 0b1000000;
@@ -49,6 +44,17 @@ void encode(t_ham *ham, char c)
 	if (ham->v[8] != ((ham->v[9] + ham->v[10] + ham->v[11] + ham->v[12] + ham->v[13] + ham->v[14] + ham->v[15]) % 2))
 		printf("Error on 8");
 
+	// The three remaining bits are used as validators for the checkers
+	ham->v[3] = ham->v[1] ^ ham->v[2];
+	ham->v[12] = ham->v[4] ^ ham->v[8];
+	ham->v[5] = ham->v[1] ^ ham->v[2] ^ ham->v[4] ^ ham->v[8];
+
+	// Finally the lone first bit to check everything
+	for (size_t i = 0; i < 14; i++)
+	{
+		if (ham->v[i + 1])
+			ham->v[0] = !ham->v[0];
+	}
 	
 }
 
@@ -102,7 +108,7 @@ char sanitize(t_ham *ham)
 {
 	char c = 0;
 
-	
+
 }
 
 void hamming_string(char *str)
@@ -121,6 +127,7 @@ void hamming_string(char *str)
 
 	}
 	printf("<%s>\n", buff);
+	free(buff);
 }
 
 int main(int argc, char *argv[])
