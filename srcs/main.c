@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 
 typedef struct s_hamming
 {
@@ -54,10 +55,9 @@ void encode(t_ham *ham, char c)
 void scrambler(t_ham *ham)
 {
 	// Here we will either flip zero, one or two bits to check the resilience of our data
-	srand(time(NULL));
 	int random = rand();
 
-	switch (random % 3)
+	switch (rand() % 3)
 	{
 	case 0:
 		printf("no bit has been flipped\n");
@@ -79,11 +79,11 @@ char decode(t_ham *ham)
 
 	// Check the bonus security
 	if (ham->v[3])
-		dprintf(2, "Error on bit 3");
+		dprintf(2, "Error on bit 3\n");
 	if (ham->v[5])
-		dprintf(2, "Error on bit 5");
+		dprintf(2, "Error on bit 5\n");
 	if (ham->v[12])
-		dprintf(2, "Error on bit 12");
+		dprintf(2, "Error on bit 12\n");
 
 	c = c << 1 | ham->v[6];
 	c = c << 1 | ham->v[7];
@@ -94,22 +94,43 @@ char decode(t_ham *ham)
 	c = c << 1 | ham->v[14];
 	c = c << 1 | ham->v[15];
 
-	printf("%c\n", c);
+	// printf("%c\n", c);
 	return c;
 }
 
-int main(int argc, char const *argv[])
+char sanitize(t_ham *ham)
+{
+	char c = 0;
+
+	
+}
+
+void hamming_string(char *str)
+{
+	char *buff = calloc((strlen(str) + 1), sizeof(char));
+	if(!buff)
+		error("Malloc fail");
+
+	for (size_t i = 0; str[i]; i++)
+	{
+		t_ham ham;
+
+		encode(&ham, str[i]);
+		scrambler(&ham);
+		buff[i] = decode(&ham);
+
+	}
+	printf("<%s>\n", buff);
+}
+
+int main(int argc, char *argv[])
 {
 	if (argc == 1)
 		error("Invalid argument number");
 
-	t_ham ham;
+	srand(time(NULL));
 
-	encode(&ham, 'd');
-	scrambler(&ham);
-	decode(&ham);
-
-	(void)argv;
+	hamming_string(argv[1]);
 
 	return 0;
 }
